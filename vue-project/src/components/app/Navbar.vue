@@ -7,7 +7,7 @@ const route = useRoute()
 
 const menus = [
   { name: 'Home', path: '/' },
-  { name: 'About', path: '/about' },
+  { name: 'Dashboard', path: '/dashboard' },
   {
     name: 'Browse',
     path: '/browse',
@@ -20,6 +20,7 @@ const menus = [
       { name: 'Category', path: '/browse/category' },
     ],
   },
+  { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' },
 ]
 
