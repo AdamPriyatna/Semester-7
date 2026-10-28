@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -7,7 +8,7 @@ const route = useRoute()
 
 const menus = [
   { name: 'Home', path: '/' },
-  { name: 'Dashboard', path: '/dashboard' },
+  { name: 'About', path: '/about' },
   {
     name: 'Browse',
     path: '/browse',
@@ -15,13 +16,13 @@ const menus = [
       {
         name: 'Event List',
         path: '/browse/events',
-        children: [{ name: 'Event Detail (Sample)', path: '/browse/events/1' }],
       },
       { name: 'Category', path: '/browse/category' },
+      { name: 'Your Events', path: '/browse/your-events' },
     ],
   },
-  { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' },
+  { name: 'Organizer Dashboard', path: '/dashboard' },
 ]
 
 const handleScroll = () => {
@@ -49,11 +50,14 @@ onUnmounted(() => {
           xmlns="http://www.w3.org/2000/svg"
           class="logo-icon"
         >
-          <path d="M12 0L22.3923 6V18L12 24L1.6077 18V6L12 0Z" fill="white" />
           <path
-            d="M15 9.5 C15 9.5 14 8 12 8 C9.5 8 8 10 8 12.5 C8 15 9.5 17 12 17 C14 17 15 16 15.5 14.5 V 12.5 H 12.5"
-            stroke="#1A1643"
-            stroke-width="2.5"
+            d="M12 0.22 3.923 6.18L12 24.1L24.1 6.077 18.6 0Z"
+            fill="white"
+          />
+          <path
+            d="M15 9.5 C15 9.4 8 12 8 12 C9.5 8 10 8 12.5 8 15 9.5 17 12 17 14 17 16 15 16.5 14.5 14.5 V12.5 H12.5"
+            stroke="#1A1A43"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
           />
@@ -62,18 +66,22 @@ onUnmounted(() => {
       </router-link>
 
       <ul class="nav-menu">
-        <li class="nav-item" v-for="menu in menus" :key="menu.name">
+        <li
+          class="nav-item"
+          v-for="menu in menus"
+          :key="menu.name"
+        >
           <router-link
             :to="menu.path"
             class="nav-link"
             :class="{
               active:
                 route.path === menu.path ||
-                (menu.path !== '/' && route.path.startsWith(menu.path)),
+                (menu.path !== '/' &&
+                  route.path.startsWith(menu.path)),
             }"
           >
             {{ menu.name }}
-
             <svg
               v-if="menu.children"
               class="dropdown-indicator"
@@ -97,9 +105,11 @@ onUnmounted(() => {
               :key="child.name"
               class="dropdown-item"
             >
-              <router-link :to="child.path" class="dropdown-link">
+              <router-link
+                :to="child.path"
+                class="dropdown-link"
+              >
                 {{ child.name }}
-
                 <svg
                   v-if="child.children"
                   class="submenu-indicator"
@@ -117,13 +127,19 @@ onUnmounted(() => {
               </router-link>
 
               <!-- Second Level Dropdown (Submenu) -->
-              <ul v-if="child.children" class="submenu">
+              <ul
+                v-if="child.children"
+                class="submenu"
+              >
                 <li
                   v-for="subchild in child.children"
                   :key="subchild.name"
                   class="submenu-item"
                 >
-                  <router-link :to="subchild.path" class="dropdown-link">
+                  <router-link
+                    :to="subchild.path"
+                    class="dropdown-link"
+                  >
                     {{ subchild.name }}
                   </router-link>
                 </li>
@@ -148,12 +164,10 @@ onUnmounted(() => {
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="2" y1="12" x2="22" y2="12"></line>
             <path
-              d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20"
             ></path>
           </svg>
-
-          <span class="lang-text">EN</span>
-
+          <span class="lang-text">ENK</span>
           <svg
             width="18"
             height="18"
@@ -264,7 +278,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 1rem 0; /* Memberi ruang hover */
+  padding: 1rem 0;
 }
 
 .nav-link {
@@ -304,17 +318,18 @@ onUnmounted(() => {
   transform: rotate(180deg);
 }
 
-/* ==================================
-DROPDOWN & SUBMENU STYLES
-Inspired by user reference image
-================================== */
+/* ================================
+   DROPDOWN & SUBMENU STYLES
+   Inspired by user reference image
+   ================================ */
 
 .dropdown-menu {
-  display: none; /* diubah jadi block saat hover */
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #d8d8d8; /* warna abu seperti referensi */
+
+  background-color: #d8d8d8;
   min-width: 200px;
   list-style: none;
   padding: 0;
@@ -323,14 +338,14 @@ Inspired by user reference image
   border-radius: 4px;
 }
 
-/* Tampilkan dropdown level 1 saat nav-item di-hover */
+/* Tampilkan dropdown Level 1 saat nav-item di-hover */
 .nav-item:hover .dropdown-menu {
   display: block;
   animation: fadeIn 0.2s ease-out;
 }
 
 .dropdown-item {
-  position: relative; /* relative untuk submenu absolut */
+  position: relative;
 }
 
 .dropdown-link {
@@ -339,7 +354,7 @@ Inspired by user reference image
   align-items: center;
   padding: 12px 20px;
   text-decoration: none;
-  color: #333; /* text gelap */
+  color: #333;
   font-size: 0.95rem;
   transition:
     background-color 0.2s,
@@ -348,7 +363,7 @@ Inspired by user reference image
 }
 
 .dropdown-link:hover {
-  background-color: #c4c4c4; /* efek hover lebih gelap sedikit */
+  background-color: #c4c4c4;
   color: #000;
 }
 
@@ -372,7 +387,7 @@ Inspired by user reference image
   border-radius: 4px;
 }
 
-/* Tampilkan submenu level 2 saat dropdown-item di-hover */
+/* Tampilkan submenu Level 2 saat dropdown-item di-hover */
 .dropdown-item:hover .submenu {
   display: block;
   animation: fadeIn 0.2s ease-out;
@@ -390,14 +405,13 @@ Inspired by user reference image
   }
 }
 
-/* Submenu pada parent (jika left:100% terlalu mentok layar)
-Kita bisa membiarkannya default left 100%.
+/* Submenu pada parent (Jika left:100% terlalu mentok layar)
+   Kita bisa membiarkannya default left 100%.
 */
 
-/* ==================================
-RIGHT SECTION
-================================== */
-
+/* ================================
+   RIGHT SECTION
+   ================================ */
 .nav-right {
   display: flex;
   align-items: center;

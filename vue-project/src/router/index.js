@@ -1,3 +1,4 @@
+
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layout/app.vue'
 import DashboardLayout from '@/layout/DashboardLayout.vue'
@@ -39,10 +40,28 @@ const routes = [
             meta: { breadcrumb: 'Event Detail' }
           },
           {
+            path: 'events/:id/register',
+            name: 'event-registration',
+            component: () => import('@/components/views/EventRegistration.vue'),
+            meta: { breadcrumb: 'Register Event' }
+          },
+          {
             path: 'category',
             name: 'category',
             component: () => import('@/components/views/Category.vue'),
             meta: { breadcrumb: 'Category' }
+          },
+          {
+            path: 'your-events',
+            name: 'your-events',
+            component: () => import('@/components/views/YourEvents.vue'),
+            meta: { breadcrumb: 'Your Events' }
+          },
+          {
+            path: 'your-events/:id',
+            name: 'ticket-receipt',
+            component: () => import('@/components/views/TicketReceipt.vue'),
+            meta: { breadcrumb: 'Ticket Receipt' }
           }
         ]
       },
@@ -70,12 +89,24 @@ const routes = [
         component: () => import('@/components/views/EventManagement.vue')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 export default router
+

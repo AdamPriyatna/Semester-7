@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -10,7 +11,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 const router = useRouter();
 
 // MENGONSUMSI SINGLE SOURCE OF TRUTH (Hanya mengambil event yang berstatus aktif)
-const { activeEvents } = useEvents();
+const { activeEvents, isUserRegistered } = useEvents();
 
 const searchQuery = ref('');
 const selectedCategory = ref('All');
@@ -20,7 +21,7 @@ const categories = ['All', 'Workshop', 'Meetup', 'Competition', 'Seminar', 'Conf
 const filteredEvents = computed(() => {
   return activeEvents.value.filter(event => {
     const matchSearch = event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                        event.loc.toLowerCase().includes(searchQuery.value.toLowerCase());
+      event.loc.toLowerCase().includes(searchQuery.value.toLowerCase());
     const matchCat = selectedCategory.value === 'All' || event.cat === selectedCategory.value;
     return matchSearch && matchCat;
   });
@@ -49,13 +50,14 @@ const handleViewDetail = (id) => {
         v-for="event in filteredEvents"
         :key="event.id"
         :event="event"
+        :is-registered="isUserRegistered(event.id)"
         @view-detail="handleViewDetail"
       />
     </div>
 
     <!-- FRIENDLY EMPTY STATE -->
     <div v-else class="empty-state">
-      <div class="empty-icon">📭</div>
+      <div class="empty-badge">CATALOG EMPTY</div>
       <h3>No Events Available Yet</h3>
       <p>
         There are currently no active events scheduled. Are you an organizer?
@@ -71,9 +73,19 @@ const handleViewDetail = (id) => {
 </template>
 
 <style scoped>
-.header-section { margin-bottom: var(--space-8); }
-.section-title { font-size: 2.2rem; margin-bottom: var(--space-2); }
-.section-desc { color: var(--text-muted); font-size: 1.1rem; }
+.header-section {
+  margin-bottom: var(--space-8);
+}
+
+.section-title {
+  font-size: 2.2rem;
+  margin-bottom: var(--space-2);
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
 
 .filters-section {
   margin-bottom: var(--space-6);
@@ -94,14 +106,22 @@ const handleViewDetail = (id) => {
   background: white;
   border-radius: var(--space-4);
   border: 1px dashed var(--border-color);
-  max-width: 800px;
+  max-width: 600px;
   margin: var(--space-8) auto;
   box-shadow: 0 4px 15px rgba(0,0,0,0.02);
 }
 
-.empty-icon {
-  font-size: 3.5rem;
-  margin-bottom: var(--space-3);
+.empty-badge {
+  display: inline-block;
+  background: var(--bg-light);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-4);
 }
 
 .empty-state h3 {
