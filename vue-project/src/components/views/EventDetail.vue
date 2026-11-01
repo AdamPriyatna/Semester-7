@@ -1,6 +1,5 @@
-
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useEvents } from '@/composables/useEvents';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -8,25 +7,40 @@ import AppCard from '@/components/ui/AppCard.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { getEventById, isUserRegistered } = useEvents();
+const { getEventById, isUserRegistered, fetchEventById, loading, error } = useEvents();
 
-// MENGAMBIL DATA EVENT DINAMIS DARI STATE BERDASARKAN ID DI URL
+// MENGAMBIL DATA EVENT DARI STATE BERDASARKAN ID URL
 const event = computed(() => getEventById(route.params.id));
 
-// CEK APAKAH PENGGUNA SUDAH TERDAFTAR DI EVENT INI
+// CEK APAKAH PENGGUNA SUDAH TERDAFTAR DI EVENT
 const isRegistered = computed(() => {
-  return event.value ? isUserRegistered(event.value.id) : false;
+  if (!event.value) return false;
+  return isUserRegistered(event.value.id);
+});
+
+// PASTIKAN DATA DIAMBIL DARI REST API JIKA USER LANGSUNG MASUK KE URL DETAIL
+onMounted(async () => {
+  if (!event.value) {
+    await fetchEventById(route.params.id);
+  }
 });
 </script>
 
 <template>
   <div class="event-detail-page">
     <button @click="router.push('/browse/events')" class="btn-back">
-      &larr; Back to Events
+      ← Back to Events
     </button>
 
-    <!-- KONDISI JIKA EVENT DITEMUKAN -->
-    <div v-if="event">
+    <!-- KONDISI 1: LOADING DETAIL ACARA DARI SERVER -->
+    <div v-if="loading" class="detail-loading skeleton-shimmer" style="min-height: 180px; display: flex; align-items: center; justify-content: center;">
+      <p style="color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
+        ⏳ Memuat rincian acara dari server...
+      </p>
+    </div>
+
+    <!-- KONDISI 2: DATA EVENT DITEMUKAN -->
+    <div v-else-if="event">
       <div class="detail-header">
         <div class="header-tags">
           <span class="event-tag">{{ event.cat }}</span>
@@ -41,12 +55,13 @@ const isRegistered = computed(() => {
         <div class="meta-info">
           <span class="meta-item"><strong>Date:</strong> {{ event.date }}</span>
           <span class="meta-item"><strong>Location:</strong> {{ event.loc }}</span>
-          <span class="meta-item"><strong>Remaining Quota:</strong> {{ event.quota }} Attendees</span>
+          <span class="meta-item"><strong>Remaining Quota:</strong> {{ event.quota || 0 }} Attendees</span>
         </div>
       </div>
 
       <!-- ASYMMETRICAL LAYOUT -->
-      <div class="detail-content-grid grid-asymmetric">
+      <div class="detail-content grid-asymmetric">
+
         <!-- F-PATTERN: Breaking text with Headings & Paragraphs -->
         <div class="main-desc">
           <h2>About This Event</h2>
@@ -55,7 +70,7 @@ const isRegistered = computed(() => {
           </p>
         </div>
 
-        <!-- FOCAL POINT & STICKY PANE -->
+        <!-- FOCAL POINT: A STICKY PANE -->
         <div class="sidebar">
           <AppCard class="ticket-card sticky-pane">
             <h3>Event Registration</h3>
@@ -89,13 +104,13 @@ const isRegistered = computed(() => {
               <div v-else-if="isRegistered" class="registered-action-group">
                 <AppButton
                   variant="secondary"
-                  class="btn-registered"
+                  class="btn-register btn-registered"
                   disabled
                 >
                   Already Registered
                 </AppButton>
                 <router-link :to="'/browse/your-events/' + event.id" class="view-receipt-link">
-                  View Your Ticket Receipt &rarr;
+                  View Your Ticket Receipt →
                 </router-link>
               </div>
 
@@ -128,10 +143,10 @@ const isRegistered = computed(() => {
       </div>
     </div>
 
-    <!-- EMPTY STATE IF NOT FOUND -->
+    <!-- KONDISI 3: EMPTY / ERROR STATE IF ID NOT FOUND -->
     <div v-else class="not-found-card">
       <h2>404 - Event Not Found</h2>
-      <p>The event you are looking for is unavailable or has been removed by the organizer.</p>
+      <p>{{ error || 'The event you are looking for is unavailable or has been removed by the organizer.' }}</p>
       <AppButton variant="primary" @click="router.push('/browse/events')">
         Back to Event Catalog
       </AppButton>
@@ -164,7 +179,7 @@ const isRegistered = computed(() => {
 
 .header-tags {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: center;
   margin-bottom: var(--space-4);
   flex-wrap: wrap;
@@ -277,7 +292,7 @@ const isRegistered = computed(() => {
 }
 
 .ticket-desc.text-success {
-  color: #198754;
+  color: #15803d;
   font-weight: 500;
 }
 
@@ -295,28 +310,12 @@ const isRegistered = computed(() => {
   opacity: 0.65;
 }
 
-.btn-registered {
-  cursor: default;
-  background: #e1f5f9;
-  color: #1293b3;
-  border: 1px solid var(--border-color);
-  opacity: 1;
-}
-
-.registered-action-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: 100%;
-}
-
 .view-receipt-link {
-  font-size: 0.9rem;
-  font-weight: 600;
+  display: block;
+  margin-top: var(--space-3);
   color: var(--primary);
+  font-weight: 600;
   text-decoration: none;
-  display: inline-block;
-  transition: color 0.2s;
 }
 
 .view-receipt-link:hover {
@@ -324,22 +323,21 @@ const isRegistered = computed(() => {
 }
 
 .spots {
-  margin-top: var(--space-4);
-  color: #27ae60;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: var(--space-3);
 }
 
 .not-found-card {
   text-align: center;
   padding: var(--space-12);
   background: white;
+  border: 1px dashed var(--border-color);
   border-radius: var(--space-4);
-  border: 1px solid var(--border-color);
 }
 
 .not-found-card h2 {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .not-found-card p {

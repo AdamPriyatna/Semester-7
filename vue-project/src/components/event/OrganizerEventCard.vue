@@ -1,4 +1,3 @@
-
 <script setup>
 import AppCard from '@/components/ui/AppCard.vue';
 
@@ -13,7 +12,7 @@ defineProps({
   }
 });
 
-defineEmits(['view-detail', 'view', 'complete', 'delete']);
+defineEmits(['view-detail', 'complete', 'delete']);
 </script>
 
 <template>
@@ -26,7 +25,7 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
     </div>
 
     <h3 :class="['event-title', { 'text-strike': isCompleted }]">{{ event.title }}</h3>
-    <p class="event-meta">🗓️ {{ event.date }} &bull; {{ event.loc }}</p>
+    <p class="event-meta">📅 {{ event.date }} &bull; {{ event.loc }}</p>
     <p class="event-desc">{{ event.desc }}</p>
 
     <div v-if="isCompleted" class="completed-notice">
@@ -35,8 +34,8 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
 
     <div class="card-actions">
       <template v-if="!isCompleted">
-        <button class="btn-action btn-detail" @click="$emit('view-detail', event.id); $emit('view', event.id)">
-          🔍 View Details
+        <button class="btn-action btn-detail" @click="$emit('view-detail', event.id)">
+          👁️ View Details
         </button>
         <button class="btn-action btn-complete" @click="$emit('complete', event)">
           ✅ Complete Event
@@ -54,8 +53,6 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
     </div>
   </AppCard>
 </template>
-
-
 
 <style scoped>
 .organizer-event-card {
@@ -107,7 +104,7 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
 
 .text-strike {
   text-decoration: line-through;
-  color: #a8a8a8;
+  color: #8a8d93;
 }
 
 .card-completed {
@@ -135,7 +132,7 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
   padding: var(--space-3);
   border-radius: 6px;
   font-size: 0.85rem;
-  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .card-actions {
@@ -157,10 +154,6 @@ defineEmits(['view-detail', 'view', 'complete', 'delete']);
   background: white;
   transition: all 0.2s;
   white-space: nowrap;
-}
-
-.btn-detail {
-  color: var(--text-main);
 }
 
 .btn-detail:hover {
