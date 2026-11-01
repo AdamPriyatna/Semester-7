@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEvents } from '@/composables/useEvents';
 import AppCard from '@/components/ui/AppCard.vue';
@@ -8,11 +8,17 @@ import AppButton from '@/components/ui/AppButton.vue';
 import AppModal from '@/components/ui/AppModal.vue';
 
 const router = useRouter();
-const { userRegistrations, cancelRegistration, getEventById, events } = useEvents();
+const { userRegistrations, cancelRegistration, getEventById, events, fetchEvents } = useEvents();
+
+onMounted(() => {
+  if (events.value.length === 0) {
+    fetchEvents();
+  }
+});
 
 // HANYA MENAMPILKAN PENDAFTARAN DARI EVENT YANG MASIH ADA DI SISTEM
 const activeRegistrations = computed(() => {
-  return userRegistrations.value.filter(r => events.value.some(e => e.id === r.eventId));
+  return userRegistrations.value.filter(r => events.value.some(e => String(e.id) === String(r.eventId)));
 });
 
 // MEMERIKSA STATUS SELESAI EVENT DARI ORGANIZER DASHBOARD SECARA REAKTIF

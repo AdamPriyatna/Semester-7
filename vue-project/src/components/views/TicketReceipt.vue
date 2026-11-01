@@ -1,22 +1,28 @@
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useEvents } from '@/composables/useEvents';
 import AppModal from '@/components/ui/AppModal.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { userRegistrations, cancelRegistration, getEventById, events } = useEvents();
+const { userRegistrations, cancelRegistration, getEventById, events, fetchEvents } = useEvents();
 
-const eventId = computed(() => Number(route.params.id));
+onMounted(() => {
+  if (events.value.length === 0) {
+    fetchEvents();
+  }
+});
+
+const eventId = computed(() => String(route.params.id));
 
 // MENGAMBIL DATA TIKET JIKA EVENT MASIH ADA DI SISTEM
 const activeTicket = computed(() => {
   if (!eventId.value) return null;
-  const eventExists = events.value.some(e => e.id === eventId.value);
+  const eventExists = events.value.some(e => String(e.id) === eventId.value);
   if (!eventExists) return null;
-  return userRegistrations.value.find(r => r.eventId === eventId.value);
+  return userRegistrations.value.find(r => String(r.eventId) === eventId.value);
 });
 
 // MEMERIKSA STATUS SELESAI EVENT SECARA REAKTIF
